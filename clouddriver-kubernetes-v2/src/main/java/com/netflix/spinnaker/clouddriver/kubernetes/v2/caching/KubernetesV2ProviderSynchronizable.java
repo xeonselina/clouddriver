@@ -25,19 +25,28 @@ import com.netflix.spinnaker.clouddriver.kubernetes.config.KubernetesConfigurati
 import com.netflix.spinnaker.clouddriver.kubernetes.security.KubernetesNamedAccountCredentials;
 import com.netflix.spinnaker.clouddriver.kubernetes.v2.caching.agent.KubernetesV2CachingAgentDispatcher;
 import com.netflix.spinnaker.clouddriver.kubernetes.v2.security.KubernetesV2Credentials;
-import com.netflix.spinnaker.clouddriver.security.*;
+import com.netflix.spinnaker.clouddriver.security.AccountCredentials;
+import com.netflix.spinnaker.clouddriver.security.AccountCredentialsRepository;
+import com.netflix.spinnaker.clouddriver.security.CredentialsInitializerSynchronizable;
+import com.netflix.spinnaker.clouddriver.security.ProviderUtils;
+import com.netflix.spinnaker.clouddriver.security.ProviderVersion;
+import com.netflix.spinnaker.config.KubernetesConfiguration;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 import javax.annotation.PostConstruct;
+import javax.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 public class KubernetesV2ProviderSynchronizable implements CredentialsInitializerSynchronizable {
+
+  @Resource private KubernetesConfiguration kubernetesConfiguration;
 
   private final KubernetesV2Provider kubernetesV2Provider;
   private final AccountCredentialsRepository accountCredentialsRepository;
@@ -63,6 +72,8 @@ public class KubernetesV2ProviderSynchronizable implements CredentialsInitialize
     ScheduledExecutorService poller =
         Executors.newSingleThreadScheduledExecutor(
             new NamedThreadFactory(KubernetesV2ProviderSynchronizable.class.getSimpleName()));
+
+    poller.scheduleWithFixedDelay(this::synchronize, 15, 20, TimeUnit.SECONDS);
   }
 
   @Override
@@ -98,7 +109,7 @@ public class KubernetesV2ProviderSynchronizable implements CredentialsInitialize
 
     deletedAccounts.forEach(accountCredentialsRepository::delete);
 
-    kubernetesConfigurationProperties.getAccounts().stream()
+    kubernetesConfiguration.getAccount().stream()
         .filter(a -> ProviderVersion.v2.equals(a.getProviderVersion()))
         .forEach(
             managedAccount -> {
@@ -136,7 +147,7 @@ public class KubernetesV2ProviderSynchronizable implements CredentialsInitialize
             .collect(Collectors.toList());
 
     Set<String> newNames =
-        kubernetesConfigurationProperties.getAccounts().stream()
+        kubernetesConfiguration.getAccount().stream()
             .map(KubernetesConfigurationProperties.ManagedAccount::getName)
             .collect(Collectors.toSet());
 

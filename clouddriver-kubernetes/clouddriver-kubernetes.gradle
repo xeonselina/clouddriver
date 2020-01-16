@@ -5,6 +5,7 @@ dependencies {
   implementation project(":clouddriver-core")
   implementation project(":cats:cats-core")
   implementation project(":clouddriver-security")
+  compile project(":clouddriver-grpc")
 
   compileOnly "org.projectlombok:lombok"
   annotationProcessor "org.projectlombok:lombok"

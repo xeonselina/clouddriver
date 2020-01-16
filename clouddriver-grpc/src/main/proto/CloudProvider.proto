@@ -1,0 +1,27 @@
+syntax = "proto3";
+
+package coding.core.cloud.provider;
+
+option java_generic_services = true;
+option java_package = "net.coding.e.proto";
+option java_outer_classname = "CloudProviderProto";
+
+message CloudProviderResponse {
+    repeated CloudProvider cloudProvider = 1;
+}
+
+message CloudProvider {
+    string name = 1;
+    string context = 2;
+    string namespaces = 3;
+    string kubeconfigContents = 4;
+    bool serviceaccount = 5;
+}
+
+message getCloudProviderRequest {
+
+}
+
+service CloudProviderService {
+    rpc getCloudProvider (getCloudProviderRequest) returns (CloudProviderResponse);
+}

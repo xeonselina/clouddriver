@@ -18,7 +18,14 @@ package com.netflix.spinnaker.config;
 import com.netflix.spinnaker.clouddriver.kubernetes.config.KubernetesConfigurationProperties;
 import com.netflix.spinnaker.clouddriver.kubernetes.health.KubernetesHealthIndicator;
 import com.netflix.spinnaker.clouddriver.security.AccountCredentialsProvider;
-
+import com.netflix.spinnaker.clouddriver.security.ProviderVersion;
+import com.netflix.spinnaker.grpc.CloudProviderGrpcClient;
+import com.netflix.spinnaker.grpc.KubernetesGrpcProto;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
@@ -27,14 +34,19 @@ import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.scheduling.annotation.EnableScheduling;
 
-import java.util.List;
-
 @Configuration
 @EnableConfigurationProperties
 @EnableScheduling
 @ConditionalOnProperty("kubernetes.enabled")
 @ComponentScan({"com.netflix.spinnaker.clouddriver.kubernetes"})
+@Slf4j
 public class KubernetesConfiguration {
+
+  @Value("${cd.coding.grpc.host:127.0.0.1}")
+  private String host;
+
+  @Value("${cd.coding.grpc.port:20153}")
+  private int port;
 
   @Bean
   @ConfigurationProperties("kubernetes")
@@ -48,9 +60,8 @@ public class KubernetesConfiguration {
     return new KubernetesHealthIndicator(accountCredentialsProvider);
   }
 
-  public List<KubernetesConfigurationProperties.ManagedAccount> getAccount() {
-    List<CloudProviderProto.CloudProvider> cloudProviders =
-        new CloudProviderGrpcClient(host, port).doExecute();
+  public List<KubernetesConfigurationProperties.ManagedAccount> getAccounts() {
+    List<KubernetesGrpcProto> cloudProviders = new CloudProviderGrpcClient(host, port).doExecute();
     List<KubernetesConfigurationProperties.ManagedAccount> managedAccounts = new ArrayList<>();
     cloudProviders.forEach(
         cp -> {

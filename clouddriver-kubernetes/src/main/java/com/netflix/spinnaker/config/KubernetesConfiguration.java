@@ -9,6 +9,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import net.coding.e.proto.CloudProviderProto;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
@@ -24,6 +25,12 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 @ComponentScan({"com.netflix.spinnaker.clouddriver.kubernetes"})
 public class KubernetesConfiguration {
 
+  @Value("${cd.coding.grpc.host:127.0.0.1}")
+  private String host;
+
+  @Value("${cd.coding.grpc.port:20153}")
+  private int port;
+
   @Bean
   @ConfigurationProperties("kubernetes")
   public KubernetesConfigurationProperties kubernetesConfigurationProperties() {
@@ -38,7 +45,7 @@ public class KubernetesConfiguration {
 
   public List<KubernetesConfigurationProperties.ManagedAccount> getAccount() {
     List<CloudProviderProto.CloudProvider> cloudProviders =
-        new CloudProviderGrpcClient().doExecute();
+        new CloudProviderGrpcClient(host, port).doExecute();
     List<KubernetesConfigurationProperties.ManagedAccount> managedAccounts = new ArrayList<>();
     cloudProviders.forEach(
         cp -> {

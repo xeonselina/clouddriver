@@ -33,15 +33,15 @@ public class CloudProviderGrpcClient {
   private static final Map<String, ManagedChannel> CHANNELS = new ConcurrentHashMap<>();
   private final CloudProviderServiceGrpc.CloudProviderServiceBlockingStub blockingStub;
 
-  public CloudProviderGrpcClient() {
-    blockingStub = CloudProviderServiceGrpc.newBlockingStub(openChannel());
+  public CloudProviderGrpcClient(String host, int port) {
+    blockingStub = CloudProviderServiceGrpc.newBlockingStub(openChannel(host, port));
   }
 
-  public Channel openChannel() {
+  public Channel openChannel(String host, int port) {
     return CHANNELS.computeIfAbsent(
         "coding",
         k ->
-            NettyChannelBuilder.forAddress("127.0.0.1", 20153)
+            NettyChannelBuilder.forAddress(host, port)
                 .maxInboundMetadataSize(GRPC_MAX_MESSAGE_SIZE)
                 .usePlaintext()
                 .build());

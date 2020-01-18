@@ -5,4 +5,4 @@ ENV GRADLE_USER_HOME /gradle_cache/.gradle
 COPY . compiled_sources
 WORKDIR compiled_sources
 
-RUN ./gradlew clouddriver-web:installDist -x test --debug
+RUN ./gradlew clouddriver-web:installDist -x test

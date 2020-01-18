@@ -65,5 +65,3 @@ def setBuildFile(project) {
 rootProject.children.each {
   setBuildFile(it)
 }
-
-include 'clouddriver-grpc'

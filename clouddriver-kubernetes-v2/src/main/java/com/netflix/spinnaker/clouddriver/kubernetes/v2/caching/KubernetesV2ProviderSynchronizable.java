@@ -79,6 +79,7 @@ public class KubernetesV2ProviderSynchronizable implements CredentialsInitialize
   @Override
   @PostConstruct
   public void synchronize() {
+    log.info("k8s provider synchronize start");
     Set<String> newAndChangedAccounts = synchronizeAccountCredentials();
 
     // we only want to initialize caching agents for new or updated accounts
@@ -100,6 +101,7 @@ public class KubernetesV2ProviderSynchronizable implements CredentialsInitialize
 
     log.info("Synchronizing {} caching agents for V2 Kubernetes accounts.", allAccounts.size());
     synchronizeKubernetesV2Provider(allAccounts);
+    log.info("k8s provider synchronize end");
   }
 
   private Set<String> synchronizeAccountCredentials() {

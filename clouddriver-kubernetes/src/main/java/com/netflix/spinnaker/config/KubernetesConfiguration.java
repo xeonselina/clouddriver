@@ -22,7 +22,6 @@ import com.netflix.spinnaker.clouddriver.security.ProviderVersion;
 import com.netflix.spinnaker.grpc.CloudProviderGrpcClient;
 import com.netflix.spinnaker.grpc.KubernetesGrpcProto;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -68,11 +67,14 @@ public class KubernetesConfiguration {
           KubernetesConfigurationProperties.ManagedAccount managedAccount =
               new KubernetesConfigurationProperties.ManagedAccount();
           managedAccount.setName(cp.getName());
-          managedAccount.setNamespaces(Collections.singletonList(cp.getNamespaces()));
+          managedAccount.setNamespaces(cp.getNamespaces());
           managedAccount.setKubeconfigContents(cp.getKubeconfigContents());
           managedAccount.setContext(cp.getContext());
           managedAccount.setProviderVersion(ProviderVersion.v2);
           managedAccount.setServiceAccount(cp.getServiceaccount());
+          log.info("managedAccount info start ");
+          log.info("managedAccount : {} ", managedAccount);
+          log.info("managedAccount info end ");
           managedAccounts.add(managedAccount);
         });
     return managedAccounts;

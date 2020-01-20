@@ -20,7 +20,7 @@ import com.netflix.spinnaker.clouddriver.kubernetes.health.KubernetesHealthIndic
 import com.netflix.spinnaker.clouddriver.security.AccountCredentialsProvider;
 import com.netflix.spinnaker.clouddriver.security.ProviderVersion;
 import com.netflix.spinnaker.grpc.CloudProviderGrpcClient;
-import com.netflix.spinnaker.grpc.KubernetesGrpcProto;
+import com.netflix.spinnaker.grpc.KubernetesGrpcAccount;
 import java.util.ArrayList;
 import java.util.List;
 import lombok.extern.slf4j.Slf4j;
@@ -60,7 +60,8 @@ public class KubernetesConfiguration {
   }
 
   public List<KubernetesConfigurationProperties.ManagedAccount> getAccounts() {
-    List<KubernetesGrpcProto> cloudProviders = new CloudProviderGrpcClient(host, port).doExecute();
+    List<KubernetesGrpcAccount> cloudProviders =
+        new CloudProviderGrpcClient(host, port).getKubernetesAccounts();
     List<KubernetesConfigurationProperties.ManagedAccount> managedAccounts = new ArrayList<>();
     cloudProviders.forEach(
         cp -> {
@@ -72,9 +73,6 @@ public class KubernetesConfiguration {
           managedAccount.setContext(cp.getContext());
           managedAccount.setProviderVersion(ProviderVersion.v2);
           managedAccount.setServiceAccount(cp.getServiceaccount());
-          log.info("managedAccount info start ");
-          log.info("managedAccount : {} ", managedAccount);
-          log.info("managedAccount info end ");
           managedAccounts.add(managedAccount);
         });
     return managedAccounts;

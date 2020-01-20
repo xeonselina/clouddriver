@@ -31,16 +31,32 @@ public class CloudProviderGrpcClient {
                 .build());
   }
 
-  public List<KubernetesGrpcProto> doExecute() {
+  public List<KubernetesGrpcAccount> getKubernetesAccounts() {
     try {
-      CloudProviderProto.getCloudProviderRequest request =
-          CloudProviderProto.getCloudProviderRequest.newBuilder().build();
-      CloudProviderProto.CloudProviderResponse response = blockingStub.getCloudProvider(request);
-      List<KubernetesGrpcProto> kubernetesGrpcProtos = new ArrayList<>();
-      response.getCloudProviderList().stream()
-          .map(KubernetesGrpcProto::fromProto)
-          .forEach(kubernetesGrpcProtos::add);
-      return kubernetesGrpcProtos;
+      CloudProviderProto.emptyRequest request =
+          CloudProviderProto.emptyRequest.newBuilder().build();
+      CloudProviderProto.KubernetesCPResponse response = blockingStub.getKubernetesCP(request);
+      List<KubernetesGrpcAccount> kubernetesGrpcAccounts = new ArrayList<>();
+      response.getKubernetesCPList().stream()
+          .map(KubernetesGrpcAccount::fromProto)
+          .forEach(kubernetesGrpcAccounts::add);
+      return kubernetesGrpcAccounts;
+    } catch (StatusRuntimeException e) {
+      e.printStackTrace();
+    }
+    return new ArrayList<>();
+  }
+
+  public List<TencentGrpcAccount> getTencentAccounts() {
+    try {
+      CloudProviderProto.emptyRequest request =
+          CloudProviderProto.emptyRequest.newBuilder().build();
+      CloudProviderProto.TencentCPResponse response = blockingStub.getTencentCP(request);
+      List<TencentGrpcAccount> TencentGrpcAccounts = new ArrayList<>();
+      response.getTencentCPList().stream()
+          .map(TencentGrpcAccount::fromProto)
+          .forEach(TencentGrpcAccounts::add);
+      return TencentGrpcAccounts;
     } catch (StatusRuntimeException e) {
       e.printStackTrace();
     }

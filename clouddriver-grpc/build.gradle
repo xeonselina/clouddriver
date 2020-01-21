@@ -1,0 +1,30 @@
+plugins {
+  id 'com.google.protobuf' version '0.8.10'
+}
+
+protobuf {
+  protoc {
+    artifact = "com.google.protobuf:protoc:3.10.0"
+  }
+  plugins {
+    grpc {
+      artifact = "io.grpc:protoc-gen-grpc-java:1.25.0"
+    }
+  }
+  generateProtoTasks {
+    all()*.plugins {
+      grpc {}
+    }
+  }
+  generatedFilesBaseDir = "$projectDir/src/generated"
+}
+
+dependencies {
+  implementation "io.grpc:grpc-protobuf:1.25.0"
+  implementation "io.grpc:grpc-stub:1.25.0"
+  implementation "io.grpc:grpc-netty-shaded:1.25.0"
+  implementation "org.codehaus.groovy:groovy-all"
+
+  compileOnly "org.projectlombok:lombok"
+  annotationProcessor "org.projectlombok:lombok"
+}

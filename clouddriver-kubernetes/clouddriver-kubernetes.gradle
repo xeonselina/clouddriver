@@ -1,36 +1,11 @@
-plugins {
-  id 'com.google.protobuf' version '0.8.10'
-}
-
 tasks.compileGroovy.enabled = false
 sourceSets.main.java.srcDirs = ['src/main/java']
-
-def grpcVersion = '1.25.0'
-
-protobuf {
-  protoc {
-    artifact = "com.google.protobuf:protoc:3.10.0"
-  }
-  plugins {
-    grpc {
-      artifact = "io.grpc:protoc-gen-grpc-java:${grpcVersion}"
-    }
-  }
-  generateProtoTasks {
-    all()*.plugins {
-      grpc {}
-    }
-  }
-  generatedFilesBaseDir = "$projectDir/src/generated"
-}
 
 dependencies {
   implementation project(":clouddriver-core")
   implementation project(":cats:cats-core")
   implementation project(":clouddriver-security")
-  implementation "io.grpc:grpc-protobuf:${grpcVersion}"
-  implementation "io.grpc:grpc-stub:${grpcVersion}"
-  implementation "io.grpc:grpc-netty-shaded:${grpcVersion}"
+  implementation project(":clouddriver-grpc")
 
   compileOnly "org.projectlombok:lombok"
   annotationProcessor "org.projectlombok:lombok"

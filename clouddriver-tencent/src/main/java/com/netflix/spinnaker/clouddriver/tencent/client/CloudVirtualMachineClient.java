@@ -10,9 +10,9 @@ import java.util.List;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.util.StringUtils;
+import org.springframework.util.CollectionUtils;
 
-@Slf4j
+@Slf4j(topic = "CloudVirtualMachineClient")
 @Data
 @EqualsAndHashCode(callSuper = false)
 public class CloudVirtualMachineClient extends AbstractTencentServiceClient {
@@ -28,7 +28,39 @@ public class CloudVirtualMachineClient extends AbstractTencentServiceClient {
       for (int i = 0; i < len; i += getDEFAULT_LIMIT()) {
         int count = Math.min(len, getDEFAULT_LIMIT());
         request.setInstanceIds(instanceIds.stream().skip(i).limit(count).toArray(String[]::new));
-        client.TerminateInstances(request);
+        TerminateInstancesResponse response = client.TerminateInstances(request);
+        log.info("terminateInstances result {}", response);
+      }
+    } catch (TencentCloudSDKException e) {
+      throw new TencentOperationException(e.toString());
+    }
+  }
+
+  public void startInstances(final List<String> instanceIds) {
+    try {
+      final StartInstancesRequest request = new StartInstancesRequest();
+      final int len = instanceIds.size();
+      for (int i = 0; i < len; i += getDEFAULT_LIMIT()) {
+        int count = Math.min(len, getDEFAULT_LIMIT());
+        request.setInstanceIds(instanceIds.stream().skip(i).limit(count).toArray(String[]::new));
+        StartInstancesResponse response = client.StartInstances(request);
+        log.info("StartInstances result {}", response);
+      }
+    } catch (TencentCloudSDKException e) {
+      throw new TencentOperationException(e.toString());
+    }
+  }
+
+  public void stopInstances(final List<String> instanceIds) {
+    try {
+      final StopInstancesRequest request = new StopInstancesRequest();
+      final int len = instanceIds.size();
+      for (int i = 0; i < len; i += getDEFAULT_LIMIT()) {
+        int count = Math.min(len, getDEFAULT_LIMIT());
+        request.setInstanceIds(instanceIds.stream().skip(i).limit(count).toArray(String[]::new));
+        request.setStoppedMode("KEEP_CHARGING");
+        StopInstancesResponse response = client.StopInstances(request);
+        log.info("StopInstances result {}", response);
       }
     } catch (TencentCloudSDKException e) {
       throw new TencentOperationException(e.toString());
@@ -87,7 +119,7 @@ public class CloudVirtualMachineClient extends AbstractTencentServiceClient {
           DescribeInstancesRequest request = new DescribeInstancesRequest();
           request.setOffset(offset);
           request.setLimit(limit);
-          if (StringUtils.isEmpty(instanceIds)) {
+          if (!CollectionUtils.isEmpty(instanceIds)) {
             int end = Math.min(offset + limit - 1, instanceIds.size() - 1);
             if (offset < end) {
               request.setInstanceIds(
@@ -95,6 +127,13 @@ public class CloudVirtualMachineClient extends AbstractTencentServiceClient {
             }
           }
           DescribeInstancesResponse response = client.DescribeInstances(request);
+          log.info(
+              "cloudVirtualMachineClient getInstances {}",
+              Arrays.stream(response.getInstanceSet())
+                  .map(
+                      it -> {
+                        return "instance" + it.getInstanceId() + "status" + it.getInstanceState();
+                      }));
           return Arrays.asList(response.getInstanceSet());
         });
   }

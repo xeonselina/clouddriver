@@ -5,7 +5,16 @@ import com.netflix.spectator.api.Registry;
 import com.netflix.spinnaker.cats.agent.CachingAgent;
 import com.netflix.spinnaker.clouddriver.security.AccountCredentialsRepository;
 import com.netflix.spinnaker.clouddriver.tencent.provider.TencentInfrastructureProvider;
-import com.netflix.spinnaker.clouddriver.tencent.provider.agent.*;
+import com.netflix.spinnaker.clouddriver.tencent.provider.agent.TencentImageCachingAgent;
+import com.netflix.spinnaker.clouddriver.tencent.provider.agent.TencentInstanceCachingAgent;
+import com.netflix.spinnaker.clouddriver.tencent.provider.agent.TencentInstanceTypeCachingAgent;
+import com.netflix.spinnaker.clouddriver.tencent.provider.agent.TencentKeyPairCachingAgent;
+import com.netflix.spinnaker.clouddriver.tencent.provider.agent.TencentLoadBalancerCachingAgent;
+import com.netflix.spinnaker.clouddriver.tencent.provider.agent.TencentLoadBalancerInstanceStateCachingAgent;
+import com.netflix.spinnaker.clouddriver.tencent.provider.agent.TencentNetworkCachingAgent;
+import com.netflix.spinnaker.clouddriver.tencent.provider.agent.TencentSecurityGroupCachingAgent;
+import com.netflix.spinnaker.clouddriver.tencent.provider.agent.TencentServerGroupCachingAgent;
+import com.netflix.spinnaker.clouddriver.tencent.provider.agent.TencentSubnetCachingAgent;
 import com.netflix.spinnaker.clouddriver.tencent.security.TencentNamedAccountCredentials;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -15,7 +24,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.DependsOn;
 import org.springframework.context.annotation.Import;
 
 @Configuration
@@ -23,7 +31,7 @@ import org.springframework.context.annotation.Import;
 @EnableConfigurationProperties
 public class TencentInfrastructureProviderConfig {
   @Bean
-  @DependsOn("tencentNamedAccountCredentials")
+  //  @DependsOn("tencentNamedAccountCredentials")
   public TencentInfrastructureProvider tencentInfrastructureProvider(
       AccountCredentialsRepository accountCredentialsRepository,
       final ObjectMapper objectMapper,

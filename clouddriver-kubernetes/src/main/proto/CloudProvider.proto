@@ -1,7 +1,7 @@
 syntax = "proto3";
- 
+
 package coding.core.cloud.provider;
- 
+
 option java_generic_services = true;
 option java_package = "net.coding.e.proto";
 option java_outer_classname = "CloudProviderProto";
@@ -13,7 +13,7 @@ message emptyRequest {
 message KubernetesCPResponse {
     repeated KubernetesCP KubernetesCP = 1;
 }
- 
+
 message KubernetesCP {
     string name = 1;
     string context = 2;
@@ -30,8 +30,9 @@ message TencentCP {
     string name = 1;
     string secretId = 2;
     string secretKey = 3;
+    repeated string regions = 4;
 }
- 
+
 service CloudProviderService {
     rpc getKubernetesCP (emptyRequest) returns (KubernetesCPResponse);
     rpc getTencentCP (emptyRequest) returns (TencentCPResponse);

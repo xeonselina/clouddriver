@@ -23,7 +23,7 @@ import lombok.Data;
 
 @Data
 public class KubernetesConfigurationProperties {
-  private static final int DEFAULT_CACHE_THREADS = 1;
+  private static final int DEFAULT_CACHE_THREADS = 8;
   private List<ManagedAccount> accounts = new ArrayList<>();
 
   @Data
@@ -58,7 +58,7 @@ public class KubernetesConfigurationProperties {
     private List<KubernetesCachingPolicy> cachingPolicies = new ArrayList<>();
     private List<String> kinds = new ArrayList<>();
     private List<String> omitKinds = new ArrayList<>();
-    private boolean onlySpinnakerManaged = false;
+    private boolean onlySpinnakerManaged = true;
     private boolean liveManifestCalls = false;
     private Long cacheIntervalSeconds;
   }

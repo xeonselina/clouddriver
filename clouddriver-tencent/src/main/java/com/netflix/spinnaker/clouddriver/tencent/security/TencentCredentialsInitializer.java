@@ -13,6 +13,7 @@ import com.netflix.spinnaker.clouddriver.tencent.provider.config.TencentInfrastr
 import com.netflix.spinnaker.config.TencentConfiguration;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
@@ -20,7 +21,6 @@ import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 import javax.annotation.PostConstruct;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.util.StringUtils;
 
@@ -33,9 +33,6 @@ public class TencentCredentialsInitializer implements CredentialsInitializerSync
   private final TencentInfrastructureProvider tencentInfrastructureProvider;
   private final CatsModule catsModule;
   private final TencentInfrastructureProviderConfig tencentInfrastructureProviderConfig;
-
-  @Value("${tencent.sync.delay:5}")
-  private Integer delay;
 
   public TencentCredentialsInitializer(
       AccountCredentialsRepository accountCredentialsRepository,
@@ -52,6 +49,9 @@ public class TencentCredentialsInitializer implements CredentialsInitializerSync
     ScheduledExecutorService poller =
         Executors.newSingleThreadScheduledExecutor(
             new NamedThreadFactory(TencentCredentialsInitializer.class.getSimpleName()));
+
+    Integer delay =
+        Optional.ofNullable(System.getenv("tencent.sync.delay")).map(Integer::valueOf).orElse(5);
 
     poller.scheduleWithFixedDelay(this::synchronize, 5, delay, TimeUnit.SECONDS);
   }

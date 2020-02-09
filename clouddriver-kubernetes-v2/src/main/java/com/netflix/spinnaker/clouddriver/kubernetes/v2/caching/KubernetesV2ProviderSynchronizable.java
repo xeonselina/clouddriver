@@ -34,6 +34,7 @@ import com.netflix.spinnaker.config.KubernetesConfiguration;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
@@ -42,7 +43,6 @@ import java.util.stream.Collectors;
 import javax.annotation.PostConstruct;
 import javax.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Value;
 
 @Slf4j
 public class KubernetesV2ProviderSynchronizable implements CredentialsInitializerSynchronizable {
@@ -55,9 +55,6 @@ public class KubernetesV2ProviderSynchronizable implements CredentialsInitialize
   private final KubernetesConfigurationProperties kubernetesConfigurationProperties;
   private final KubernetesV2Credentials.Factory credentialFactory;
   private final CatsModule catsModule;
-
-  @Value("${k8s.sync.delay:5}")
-  private Integer delay;
 
   public KubernetesV2ProviderSynchronizable(
       KubernetesV2Provider kubernetesV2Provider,
@@ -76,6 +73,9 @@ public class KubernetesV2ProviderSynchronizable implements CredentialsInitialize
     ScheduledExecutorService poller =
         Executors.newSingleThreadScheduledExecutor(
             new NamedThreadFactory(KubernetesV2ProviderSynchronizable.class.getSimpleName()));
+
+    int delay =
+        Optional.ofNullable(System.getenv("k8s.sync.delay")).map(Integer::valueOf).orElse(5);
 
     poller.scheduleWithFixedDelay(this::synchronize, 5, delay, TimeUnit.SECONDS);
   }

@@ -8,9 +8,9 @@ import org.springframework.context.annotation.Configuration;
 @Data
 public class GrpcSettings {
 
-  @Value("${cd.coding.grpc.host:9.134.32.36}")
+  @Value("${cd.coding.grpc.host:localhost}")
   private String host;
 
-  @Value("${cd.coding.grpc.port:20153}")
+  @Value("${cd.coding.grpc.port:28888}")
   private int port;
 }

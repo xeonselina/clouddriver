@@ -19,18 +19,21 @@ import com.netflix.spinnaker.clouddriver.kubernetes.config.KubernetesConfigurati
 import com.netflix.spinnaker.clouddriver.kubernetes.health.KubernetesHealthIndicator;
 import com.netflix.spinnaker.clouddriver.security.AccountCredentialsProvider;
 import com.netflix.spinnaker.clouddriver.security.ProviderVersion;
-import com.netflix.spinnaker.grpc.CloudProviderGrpcClient;
-import com.netflix.spinnaker.grpc.KubernetesGrpcAccount;
-import java.util.ArrayList;
-import java.util.List;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Value;
+import com.netflix.spinnaker.grpc.client.CloudProviderGrpcClient;
+
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.scheduling.annotation.EnableScheduling;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import javax.annotation.Resource;
+
+import lombok.extern.slf4j.Slf4j;
 
 @Configuration
 @EnableConfigurationProperties
@@ -40,40 +43,41 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 @Slf4j
 public class KubernetesConfiguration {
 
-  @Value("${cd.coding.grpc.host:127.0.0.1}")
-  private String host;
-
-  @Value("${cd.coding.grpc.port:20153}")
-  private int port;
+  @Resource
+  private CloudProviderGrpcClient cloudProviderGrpcClient;
 
   @Bean
-  //  @ConfigurationProperties("kubernetes")
   public KubernetesConfigurationProperties kubernetesConfigurationProperties() {
     return new KubernetesConfigurationProperties();
   }
 
   @Bean
   public KubernetesHealthIndicator kubernetesHealthIndicator(
-      AccountCredentialsProvider accountCredentialsProvider) {
+    AccountCredentialsProvider accountCredentialsProvider) {
     return new KubernetesHealthIndicator(accountCredentialsProvider);
   }
 
   public List<KubernetesConfigurationProperties.ManagedAccount> getAccounts() {
-    List<KubernetesGrpcAccount> cloudProviders =
-        new CloudProviderGrpcClient(host, port).getKubernetesAccounts();
     List<KubernetesConfigurationProperties.ManagedAccount> managedAccounts = new ArrayList<>();
-    cloudProviders.forEach(
-        cp -> {
-          KubernetesConfigurationProperties.ManagedAccount managedAccount =
-              new KubernetesConfigurationProperties.ManagedAccount();
-          managedAccount.setName(cp.getName());
-          managedAccount.setNamespaces(cp.getNamespaces());
-          managedAccount.setKubeconfigContents(cp.getKubeconfigContents());
-          managedAccount.setContext(cp.getContext());
-          managedAccount.setProviderVersion(ProviderVersion.v2);
-          managedAccount.setServiceAccount(cp.getServiceaccount());
-          managedAccounts.add(managedAccount);
-        });
+    cloudProviderGrpcClient.getKubernetesAccounts().forEach(
+      cp -> {
+        KubernetesConfigurationProperties.ManagedAccount managedAccount =
+          new KubernetesConfigurationProperties.ManagedAccount();
+        managedAccount.setName(cp.getName());
+        managedAccount.setNamespaces(cp.getNamespaces());
+        managedAccount.setKubeconfigContents(cp.getKubeconfigContents());
+        managedAccount.setContext(cp.getContext());
+        managedAccount.setProviderVersion(ProviderVersion.v2);
+        managedAccount.setServiceAccount(cp.getServiceaccount());
+
+//        managedAccount.setOnlySpinnakerManaged(true);
+//        managedAccount.setCacheThreads(8);
+//        Permissions.Builder builder = new Permissions.Builder().add(Authorization.READ, "codingcorp:团队所有者")
+//          .add(Authorization.WRITE, "codingcorp:团队所有者")
+//          .add(Authorization.EXECUTE, "codingcorp:团队所有者");
+//        managedAccount.setPermissions(builder);
+        managedAccounts.add(managedAccount);
+      });
     return managedAccounts;
   }
 }

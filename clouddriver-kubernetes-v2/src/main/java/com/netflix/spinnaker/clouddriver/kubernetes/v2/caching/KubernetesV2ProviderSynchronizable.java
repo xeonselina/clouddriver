@@ -31,6 +31,9 @@ import com.netflix.spinnaker.clouddriver.security.CredentialsInitializerSynchron
 import com.netflix.spinnaker.clouddriver.security.ProviderUtils;
 import com.netflix.spinnaker.clouddriver.security.ProviderVersion;
 import com.netflix.spinnaker.config.KubernetesConfiguration;
+
+import org.springframework.beans.factory.annotation.Value;
+
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -55,6 +58,9 @@ public class KubernetesV2ProviderSynchronizable implements CredentialsInitialize
   private final KubernetesV2Credentials.Factory credentialFactory;
   private final CatsModule catsModule;
 
+  @Value("${k8s.sync.delay:5}")
+  private Integer delay;
+
   public KubernetesV2ProviderSynchronizable(
       KubernetesV2Provider kubernetesV2Provider,
       AccountCredentialsRepository accountCredentialsRepository,
@@ -73,7 +79,7 @@ public class KubernetesV2ProviderSynchronizable implements CredentialsInitialize
         Executors.newSingleThreadScheduledExecutor(
             new NamedThreadFactory(KubernetesV2ProviderSynchronizable.class.getSimpleName()));
 
-    poller.scheduleWithFixedDelay(this::synchronize, 15, 20, TimeUnit.SECONDS);
+    poller.scheduleWithFixedDelay(this::synchronize, 5, delay, TimeUnit.SECONDS);
   }
 
   @Override

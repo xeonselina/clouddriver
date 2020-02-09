@@ -17,33 +17,34 @@
 
 package com.netflix.spinnaker.clouddriver.kubernetes.v2.controllers;
 
-import com.netflix.spinnaker.grpc.CloudProviderGrpcClient;
-import com.netflix.spinnaker.grpc.KubernetesGrpcAccount;
-import com.netflix.spinnaker.grpc.TencentGrpcAccount;
-import java.util.List;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Value;
+import com.netflix.spinnaker.grpc.bean.KubernetesGrpcAccount;
+import com.netflix.spinnaker.grpc.bean.TencentGrpcAccount;
+import com.netflix.spinnaker.grpc.client.CloudProviderGrpcClient;
+
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+
+import java.util.List;
+
+import javax.annotation.Resource;
+
+import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @RestController
 @RequestMapping("/marlon/test")
 public class TestController {
 
-  @Value("${cd.coding.grpc.host:127.0.0.1}")
-  private String host;
-
-  @Value("${cd.coding.grpc.port:20153}")
-  private int port;
+  @Resource
+  CloudProviderGrpcClient cloudProviderGrpcClient;
 
   @RequestMapping("k8s")
   public List<KubernetesGrpcAccount> getKubernetes() {
-    return new CloudProviderGrpcClient(host, port).getKubernetesAccounts();
+    return cloudProviderGrpcClient.getKubernetesAccounts();
   }
 
   @RequestMapping("tencent")
   public List<TencentGrpcAccount> getTencent() {
-    return new CloudProviderGrpcClient(host, port).getTencentAccounts();
+    return cloudProviderGrpcClient.getTencentAccounts();
   }
 }

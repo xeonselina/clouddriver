@@ -31,9 +31,6 @@ import com.netflix.spinnaker.clouddriver.security.CredentialsInitializerSynchron
 import com.netflix.spinnaker.clouddriver.security.ProviderUtils;
 import com.netflix.spinnaker.clouddriver.security.ProviderVersion;
 import com.netflix.spinnaker.config.KubernetesConfiguration;
-
-import org.springframework.beans.factory.annotation.Value;
-
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -45,6 +42,7 @@ import java.util.stream.Collectors;
 import javax.annotation.PostConstruct;
 import javax.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 
 @Slf4j
 public class KubernetesV2ProviderSynchronizable implements CredentialsInitializerSynchronizable {

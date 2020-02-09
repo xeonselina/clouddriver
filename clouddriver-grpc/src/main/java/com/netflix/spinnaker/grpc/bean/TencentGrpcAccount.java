@@ -10,5 +10,4 @@ public class TencentGrpcAccount {
   private String secretId;
   private String secretKey;
   private List<String> regions;
-
 }

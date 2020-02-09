@@ -3,19 +3,15 @@ package com.netflix.spinnaker.grpc.client;
 import com.netflix.spinnaker.grpc.bean.KubernetesGrpcAccount;
 import com.netflix.spinnaker.grpc.bean.TencentGrpcAccount;
 import com.netflix.spinnaker.grpc.converter.GrpcConverter;
-
-import net.coding.e.proto.CloudProviderProto;
-import net.coding.e.proto.CloudProviderServiceGrpc;
-
-import org.springframework.stereotype.Component;
-
+import io.grpc.StatusRuntimeException;
 import java.util.ArrayList;
 import java.util.List;
-
-import io.grpc.StatusRuntimeException;
+import net.coding.e.proto.CloudProviderProto;
+import net.coding.e.proto.CloudProviderServiceGrpc;
+import org.springframework.stereotype.Component;
 
 @Component
-public class CloudProviderGrpcClient  extends BaseClient {
+public class CloudProviderGrpcClient extends BaseClient {
 
   private CloudProviderServiceGrpc.CloudProviderServiceBlockingStub getStub() {
     return CloudProviderServiceGrpc.newBlockingStub(openChannel());
@@ -25,7 +21,7 @@ public class CloudProviderGrpcClient  extends BaseClient {
     try {
       CloudProviderProto.emptyRequest request =
           CloudProviderProto.emptyRequest.newBuilder().build();
-      CloudProviderProto.KubernetesCPResponse response =  getStub().getKubernetesCP(request);
+      CloudProviderProto.KubernetesCPResponse response = getStub().getKubernetesCP(request);
       return GrpcConverter.INSTANCE.proto2kubernetes(response.getKubernetesCPList());
     } catch (StatusRuntimeException e) {
       e.printStackTrace();

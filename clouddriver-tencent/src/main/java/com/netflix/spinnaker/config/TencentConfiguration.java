@@ -7,7 +7,9 @@ import com.netflix.spinnaker.clouddriver.tencent.provider.TencentInfrastructureP
 import com.netflix.spinnaker.clouddriver.tencent.provider.config.TencentInfrastructureProviderConfig;
 import com.netflix.spinnaker.clouddriver.tencent.security.TencentCredentialsInitializer;
 import com.netflix.spinnaker.grpc.client.CloudProviderGrpcClient;
-
+import java.util.ArrayList;
+import java.util.List;
+import javax.annotation.Resource;
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.context.properties.ConfigurationProperties;
@@ -19,11 +21,6 @@ import org.springframework.context.annotation.Import;
 import org.springframework.context.annotation.Scope;
 import org.springframework.scheduling.annotation.EnableScheduling;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import javax.annotation.Resource;
-
 @Configuration
 @EnableConfigurationProperties
 @EnableScheduling
@@ -32,22 +29,21 @@ import javax.annotation.Resource;
 @Import({com.netflix.spinnaker.clouddriver.tencent.security.TencentCredentialsInitializer.class})
 public class TencentConfiguration {
 
-  @Resource
-  private CloudProviderGrpcClient cloudProviderGrpcClient;
+  @Resource private CloudProviderGrpcClient cloudProviderGrpcClient;
 
   @Bean
   public TencentCredentialsInitializer tencentCredentialsInitializer(
-    AccountCredentialsRepository accountCredentialsRepository,
-    TencentConfiguration tencentConfiguration,
-    TencentInfrastructureProvider tencentInfrastructureProvider,
-    CatsModule catsModule,
-    TencentInfrastructureProviderConfig tencentInfrastructureProviderConfig) {
+      AccountCredentialsRepository accountCredentialsRepository,
+      TencentConfiguration tencentConfiguration,
+      TencentInfrastructureProvider tencentInfrastructureProvider,
+      CatsModule catsModule,
+      TencentInfrastructureProviderConfig tencentInfrastructureProviderConfig) {
     return new TencentCredentialsInitializer(
-      accountCredentialsRepository,
-      tencentConfiguration,
-      tencentInfrastructureProvider,
-      catsModule,
-      tencentInfrastructureProviderConfig);
+        accountCredentialsRepository,
+        tencentConfiguration,
+        tencentInfrastructureProvider,
+        catsModule,
+        tencentInfrastructureProviderConfig);
   }
 
   @Scope(ConfigurableBeanFactory.SCOPE_PROTOTYPE)
@@ -59,16 +55,18 @@ public class TencentConfiguration {
 
   public List<TencentConfigurationProperties.ManagedAccount> getAccounts() {
     List<TencentConfigurationProperties.ManagedAccount> managedAccounts = new ArrayList<>();
-    cloudProviderGrpcClient.getTencentAccounts().forEach(
-      cp -> {
-        TencentConfigurationProperties.ManagedAccount managedAccount =
-          new TencentConfigurationProperties.ManagedAccount();
-        managedAccount.setName(cp.getName());
-        managedAccount.setSecretId(cp.getSecretId());
-        managedAccount.setSecretKey(cp.getSecretKey());
-        managedAccount.setRegions(cp.getRegions());
-        managedAccounts.add(managedAccount);
-      });
+    cloudProviderGrpcClient
+        .getTencentAccounts()
+        .forEach(
+            cp -> {
+              TencentConfigurationProperties.ManagedAccount managedAccount =
+                  new TencentConfigurationProperties.ManagedAccount();
+              managedAccount.setName(cp.getName());
+              managedAccount.setSecretId(cp.getSecretId());
+              managedAccount.setSecretKey(cp.getSecretKey());
+              managedAccount.setRegions(cp.getRegions());
+              managedAccounts.add(managedAccount);
+            });
     return managedAccounts;
   }
 }

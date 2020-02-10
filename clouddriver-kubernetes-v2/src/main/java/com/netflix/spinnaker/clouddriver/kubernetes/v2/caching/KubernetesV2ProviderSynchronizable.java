@@ -75,7 +75,7 @@ public class KubernetesV2ProviderSynchronizable implements CredentialsInitialize
             new NamedThreadFactory(KubernetesV2ProviderSynchronizable.class.getSimpleName()));
 
     int delay =
-        Optional.ofNullable(System.getenv("k8s.sync.delay")).map(Integer::valueOf).orElse(5);
+        Optional.ofNullable(System.getenv("k8s.sync.delay")).map(Integer::valueOf).orElse(30);
 
     poller.scheduleWithFixedDelay(this::synchronize, 5, delay, TimeUnit.SECONDS);
   }

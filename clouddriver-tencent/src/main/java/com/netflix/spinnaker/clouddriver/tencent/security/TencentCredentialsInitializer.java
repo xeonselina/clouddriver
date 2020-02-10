@@ -51,7 +51,7 @@ public class TencentCredentialsInitializer implements CredentialsInitializerSync
             new NamedThreadFactory(TencentCredentialsInitializer.class.getSimpleName()));
 
     Integer delay =
-        Optional.ofNullable(System.getenv("tencent.sync.delay")).map(Integer::valueOf).orElse(5);
+        Optional.ofNullable(System.getenv("tencent.sync.delay")).map(Integer::valueOf).orElse(30);
 
     poller.scheduleWithFixedDelay(this::synchronize, 5, delay, TimeUnit.SECONDS);
   }
@@ -83,7 +83,7 @@ public class TencentCredentialsInitializer implements CredentialsInitializerSync
                   managedAccount.getSecretId(),
                   managedAccount.getSecretKey(),
                   managedAccount.getRegions(),
-                  null);
+                  managedAccount.getPermissions().build());
           AccountCredentials existingCredentials =
               accountCredentialsRepository.getOne(credentials.getName());
           if (existingCredentials != null) {

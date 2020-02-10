@@ -6,7 +6,7 @@ import com.netflix.spinnaker.clouddriver.tencent.config.TencentConfigurationProp
 import com.netflix.spinnaker.clouddriver.tencent.provider.TencentInfrastructureProvider;
 import com.netflix.spinnaker.clouddriver.tencent.provider.config.TencentInfrastructureProviderConfig;
 import com.netflix.spinnaker.clouddriver.tencent.security.TencentCredentialsInitializer;
-import com.netflix.spinnaker.grpc.client.CloudProviderGrpcClient;
+import com.netflix.spinnaker.grpc.client.CloudAccountGrpcClient;
 import java.util.ArrayList;
 import java.util.List;
 import javax.annotation.Resource;
@@ -29,7 +29,7 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 @Import({com.netflix.spinnaker.clouddriver.tencent.security.TencentCredentialsInitializer.class})
 public class TencentConfiguration {
 
-  @Resource private CloudProviderGrpcClient cloudProviderGrpcClient;
+  @Resource private CloudAccountGrpcClient cloudAccountGrpcClient;
 
   @Bean
   public TencentCredentialsInitializer tencentCredentialsInitializer(
@@ -55,16 +55,17 @@ public class TencentConfiguration {
 
   public List<TencentConfigurationProperties.ManagedAccount> getAccounts() {
     List<TencentConfigurationProperties.ManagedAccount> managedAccounts = new ArrayList<>();
-    cloudProviderGrpcClient
+    cloudAccountGrpcClient
         .getTencentAccounts()
         .forEach(
-            cp -> {
+            account -> {
               TencentConfigurationProperties.ManagedAccount managedAccount =
                   new TencentConfigurationProperties.ManagedAccount();
-              managedAccount.setName(cp.getName());
-              managedAccount.setSecretId(cp.getSecretId());
-              managedAccount.setSecretKey(cp.getSecretKey());
-              managedAccount.setRegions(cp.getRegions());
+              managedAccount.setName(account.getName());
+              managedAccount.setSecretId(account.getSecretId());
+              managedAccount.setSecretKey(account.getSecretKey());
+              managedAccount.setRegions(account.getRegions());
+              managedAccount.setPermissions(account.getPermissions());
               managedAccounts.add(managedAccount);
             });
     return managedAccounts;

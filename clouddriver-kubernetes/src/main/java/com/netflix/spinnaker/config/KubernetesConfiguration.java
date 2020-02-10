@@ -19,7 +19,7 @@ import com.netflix.spinnaker.clouddriver.kubernetes.config.KubernetesConfigurati
 import com.netflix.spinnaker.clouddriver.kubernetes.health.KubernetesHealthIndicator;
 import com.netflix.spinnaker.clouddriver.security.AccountCredentialsProvider;
 import com.netflix.spinnaker.clouddriver.security.ProviderVersion;
-import com.netflix.spinnaker.grpc.client.CloudProviderGrpcClient;
+import com.netflix.spinnaker.grpc.client.CloudAccountGrpcClient;
 import java.util.ArrayList;
 import java.util.List;
 import javax.annotation.Resource;
@@ -39,7 +39,7 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 @Slf4j
 public class KubernetesConfiguration {
 
-  @Resource private CloudProviderGrpcClient cloudProviderGrpcClient;
+  @Resource private CloudAccountGrpcClient cloudAccountGrpcClient;
 
   @Bean
   public KubernetesConfigurationProperties kubernetesConfigurationProperties() {
@@ -54,26 +54,19 @@ public class KubernetesConfiguration {
 
   public List<KubernetesConfigurationProperties.ManagedAccount> getAccounts() {
     List<KubernetesConfigurationProperties.ManagedAccount> managedAccounts = new ArrayList<>();
-    cloudProviderGrpcClient
+    cloudAccountGrpcClient
         .getKubernetesAccounts()
         .forEach(
-            cp -> {
+            account -> {
               KubernetesConfigurationProperties.ManagedAccount managedAccount =
                   new KubernetesConfigurationProperties.ManagedAccount();
-              managedAccount.setName(cp.getName());
-              managedAccount.setNamespaces(cp.getNamespaces());
-              managedAccount.setKubeconfigContents(cp.getKubeconfigContents());
-              managedAccount.setContext(cp.getContext());
+              managedAccount.setName(account.getName());
+              managedAccount.setNamespaces(account.getNamespaces());
+              managedAccount.setKubeconfigContents(account.getKubeconfigContents());
+              managedAccount.setContext(account.getContext());
               managedAccount.setProviderVersion(ProviderVersion.v2);
-              managedAccount.setServiceAccount(cp.getServiceaccount());
-
-              //        managedAccount.setOnlySpinnakerManaged(true);
-              //        managedAccount.setCacheThreads(8);
-              //        Permissions.Builder builder = new
-              // Permissions.Builder().add(Authorization.READ, "codingcorp:团队所有者")
-              //          .add(Authorization.WRITE, "codingcorp:团队所有者")
-              //          .add(Authorization.EXECUTE, "codingcorp:团队所有者");
-              //        managedAccount.setPermissions(builder);
+              managedAccount.setServiceAccount(account.getServiceaccount());
+              managedAccount.setPermissions(account.getPermissions());
               managedAccounts.add(managedAccount);
             });
     return managedAccounts;

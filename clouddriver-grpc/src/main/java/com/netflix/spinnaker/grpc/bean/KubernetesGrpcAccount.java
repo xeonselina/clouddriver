@@ -1,5 +1,6 @@
 package com.netflix.spinnaker.grpc.bean;
 
+import com.netflix.spinnaker.fiat.model.resources.Permissions;
 import java.util.List;
 import lombok.Data;
 
@@ -11,4 +12,5 @@ public class KubernetesGrpcAccount {
   private List<String> namespaces;
   private String kubeconfigContents;
   private Boolean serviceaccount;
+  private Permissions.Builder permissions;
 }

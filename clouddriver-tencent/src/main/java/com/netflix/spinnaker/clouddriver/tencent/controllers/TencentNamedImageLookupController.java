@@ -49,7 +49,7 @@ public class TencentNamedImageLookupController {
   public List<NamedImage> list(LookupOptions lookupOptions, HttpServletRequest request) {
     log.info("TencentNamedImageLookupController lookupOptions = {}", lookupOptions);
     validateLookupOptions(lookupOptions);
-    String glob = StringUtils.isEmpty(lookupOptions.getQ()) ? null : lookupOptions.getQ().trim();
+    String glob = StringUtils.isEmpty(lookupOptions.getQ()) ? "" : lookupOptions.getQ().trim();
     boolean isImgId = Pattern.matches(IMG_GLOB_PATTERN, glob);
 
     // Wrap in '*' if there are no glob-style characters in the query string
@@ -103,11 +103,12 @@ public class TencentNamedImageLookupController {
   }
 
   public void validateLookupOptions(LookupOptions lookupOptions) {
-    if (lookupOptions.getQ() == null || lookupOptions.getQ().length() < MIN_NAME_FILTER) {
+    if (!StringUtils.isEmpty(lookupOptions.getQ())
+        && lookupOptions.getQ().length() < MIN_NAME_FILTER) {
       throw new InvalidRequestException(EXCEPTION_REASON);
     }
 
-    String glob = StringUtils.isEmpty(lookupOptions.getQ()) ? null : lookupOptions.getQ().trim();
+    String glob = StringUtils.isEmpty(lookupOptions.getQ()) ? "" : lookupOptions.getQ().trim();
     boolean isImgId = Pattern.matches(IMG_GLOB_PATTERN, glob);
     if (glob.equals("img") || (!isImgId && glob.startsWith("img-"))) {
       throw new InvalidRequestException(

@@ -23,13 +23,15 @@ public class TencentNamedAccountCredentials implements AccountCredentials<Tencen
       String secretId,
       String secretKey,
       List<String> regions,
-      Permissions permissions) {
+      Permissions.Builder permissions) {
     this.name = name;
     this.environment = environment;
     this.accountType = accountType;
     this.credentials = new TencentCredentials(secretId, secretKey);
     this.regions = buildRegions(regions);
-    this.permissions = permissions;
+    if (permissions != null) {
+      this.permissions = permissions.build();
+    }
 
     NamerRegistry.lookup()
         .withProvider(TencentCloudProvider.ID)

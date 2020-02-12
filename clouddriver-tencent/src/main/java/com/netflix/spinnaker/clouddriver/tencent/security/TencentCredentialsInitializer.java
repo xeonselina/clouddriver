@@ -83,7 +83,7 @@ public class TencentCredentialsInitializer implements CredentialsInitializerSync
                   managedAccount.getSecretId(),
                   managedAccount.getSecretKey(),
                   managedAccount.getRegions(),
-                  managedAccount.getPermissions().build());
+                  managedAccount.getPermissions());
           AccountCredentials existingCredentials =
               accountCredentialsRepository.getOne(credentials.getName());
           if (existingCredentials != null) {

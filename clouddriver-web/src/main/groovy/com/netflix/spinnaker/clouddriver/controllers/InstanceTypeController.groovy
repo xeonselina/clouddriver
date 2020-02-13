@@ -19,6 +19,7 @@ package com.netflix.spinnaker.clouddriver.controllers
 import com.netflix.spinnaker.clouddriver.model.InstanceType
 import com.netflix.spinnaker.clouddriver.model.InstanceTypeProvider
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.security.access.prepost.PostFilter
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RequestMethod
 import org.springframework.web.bind.annotation.RestController
@@ -31,6 +32,7 @@ class InstanceTypeController {
   List<InstanceTypeProvider> instanceTypeProviders
 
   @RequestMapping(method = RequestMethod.GET)
+  @PostFilter("hasPermission(filterObject.account, 'ACCOUNT', 'READ')")
   Set<InstanceType> list() {
       instanceTypeProviders.collectMany {
       it.all

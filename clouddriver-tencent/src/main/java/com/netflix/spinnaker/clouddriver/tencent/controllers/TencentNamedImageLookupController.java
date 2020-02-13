@@ -10,7 +10,14 @@ import com.netflix.spinnaker.cats.cache.RelationshipCacheFilter;
 import com.netflix.spinnaker.clouddriver.tencent.cache.Keys;
 import com.netflix.spinnaker.kork.web.exceptions.InvalidRequestException;
 import com.netflix.spinnaker.kork.web.exceptions.NotFoundException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import javax.servlet.http.HttpServletRequest;
@@ -29,6 +36,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/tencent/images")
 public class TencentNamedImageLookupController {
   @RequestMapping(value = "/{account}/{region}/{imageId:.+}", method = RequestMethod.GET)
+  // TODO 需要实现权限过滤器
   public List<NamedImage> getByImgId(
       @PathVariable final String account,
       @PathVariable final String region,
@@ -46,6 +54,7 @@ public class TencentNamedImageLookupController {
   }
 
   @RequestMapping(value = "/find", method = RequestMethod.GET)
+  // TODO 需要实现权限过滤器
   public List<NamedImage> list(LookupOptions lookupOptions, HttpServletRequest request) {
     log.info("TencentNamedImageLookupController lookupOptions = {}", lookupOptions);
     validateLookupOptions(lookupOptions);

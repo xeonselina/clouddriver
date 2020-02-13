@@ -19,6 +19,7 @@ package com.netflix.spinnaker.clouddriver.controllers
 import com.netflix.spinnaker.clouddriver.model.Network
 import com.netflix.spinnaker.clouddriver.model.NetworkProvider
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.security.access.prepost.PostAuthorize
 import org.springframework.security.access.prepost.PostFilter
 import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.RequestMapping
@@ -33,6 +34,7 @@ class NetworkController {
   List<NetworkProvider> networkProviders
 
   @RequestMapping(method = RequestMethod.GET)
+  @PostAuthorize("@authorizationSupport.filterNetworks(returnObject)")
   Map<String, Set<Network>> list() {
     rx.Observable.from(networkProviders).flatMap { networkProvider ->
       rx.Observable.from(networkProvider.getAll())

@@ -19,6 +19,7 @@ package com.netflix.spinnaker.clouddriver.controllers
 import com.netflix.frigga.Names
 import com.netflix.spinnaker.clouddriver.model.EntityTags
 import com.netflix.spinnaker.clouddriver.model.LoadBalancerProvider
+import com.netflix.spinnaker.clouddriver.model.Network
 import com.netflix.spinnaker.clouddriver.security.AccountCredentials
 import com.netflix.spinnaker.clouddriver.security.AccountCredentialsProvider
 import com.netflix.spinnaker.fiat.shared.FiatPermissionEvaluator
@@ -26,7 +27,6 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.security.core.Authentication
 import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.stereotype.Component
-
 /**
  * Support for controllers requiring authorization checks from Fiat.
  */
@@ -153,4 +153,23 @@ class AuthorizationSupport {
       return hasPermission
     }
   }
+
+  boolean filterNetworks(Map<String, Set<Network>> map){
+    if (!map) {
+      return false
+    }
+
+    Authentication auth = SecurityContextHolder.context.authentication;
+
+    map.values().each { def networks ->
+      networks.each {def network->
+        if (!permissionEvaluator.hasPermission(auth, network.account, 'ACCOUNT', 'READ')) {
+          networks.remove(network)
+        }
+      }
+    }
+    return true
+
+  }
+
 }

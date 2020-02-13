@@ -19,6 +19,7 @@ package com.netflix.spinnaker.clouddriver.controllers
 import com.netflix.spinnaker.clouddriver.model.Subnet
 import com.netflix.spinnaker.clouddriver.model.SubnetProvider
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.security.access.prepost.PostFilter
 import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RequestMethod
@@ -32,12 +33,14 @@ class SubnetController {
   List<SubnetProvider> subnetProviders
 
   @RequestMapping(method = RequestMethod.GET)
+  @PostFilter("hasPermission(filterObject.account, 'ACCOUNT', 'READ')")
   Set<Subnet> list() {
     subnetProviders.collectMany {
       it.all
     } as Set
   }
 
+  @PostFilter("hasPermission(filterObject.account, 'ACCOUNT', 'READ')")
   @RequestMapping(method = RequestMethod.GET, value = "/{cloudProvider}")
   Set<Subnet> listByCloudProvider(@PathVariable String cloudProvider) {
     subnetProviders.findAll { subnetProvider ->

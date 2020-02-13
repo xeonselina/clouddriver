@@ -19,6 +19,7 @@ package com.netflix.spinnaker.clouddriver.controllers
 import com.netflix.spinnaker.clouddriver.model.Network
 import com.netflix.spinnaker.clouddriver.model.NetworkProvider
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.security.access.prepost.PostFilter
 import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RequestMethod
@@ -47,6 +48,7 @@ class NetworkController {
   }
 
   @RequestMapping(method = RequestMethod.GET, value = "/{cloudProvider}")
+  @PostFilter("hasPermission(filterObject.account, 'ACCOUNT', 'READ')")
   Set<Network> listByCloudProvider(@PathVariable String cloudProvider) {
     networkProviders.findAll { networkProvider ->
       networkProvider.cloudProvider == cloudProvider

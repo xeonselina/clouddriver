@@ -29,7 +29,8 @@ public class TencentInstanceHealth implements Health {
     STOPPING,
     REBOOTING,
     SHUTDOWN,
-    TERMINATING;
+    TERMINATING,
+    UNKNOWN;
 
     public HealthState toHealthState() {
       switch (this) {

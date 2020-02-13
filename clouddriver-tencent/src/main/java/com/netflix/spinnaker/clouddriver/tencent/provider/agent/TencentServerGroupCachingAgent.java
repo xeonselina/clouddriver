@@ -386,12 +386,13 @@ public class TencentServerGroupCachingAgent extends AbstractTencentCachingAgent
               instances.forEach(
                   i -> {
                     String health = (String) i.get("healthStatus");
-                    TencentInstanceHealth.Status healthStatus = null;
+                    TencentInstanceHealth.Status healthStatus =
+                        TencentInstanceHealth.Status.UNKNOWN;
                     TencentInstanceHealth instanceHealth = new TencentInstanceHealth();
                     if (health.equals("HEALTHY")) {
                       healthStatus = TencentInstanceHealth.Status.RUNNING;
-                      instanceHealth.setInstanceStatus(healthStatus);
                     }
+                    instanceHealth.setInstanceStatus(healthStatus);
                     TencentInstance instance =
                         TencentInstance.builder()
                             .name((String) i.get("instanceId"))
@@ -402,8 +403,8 @@ public class TencentServerGroupCachingAgent extends AbstractTencentCachingAgent
                                     .getTime())
                             .zone((String) i.get("zone"))
                             .build();
-                    // log.info("TencentServerGroupCachingAgent loadAsgServerGroup iter through
-                    // instance {}", instance);
+                    log.info(
+                        "{} loadAsgServerGroup iter through instance {}", getAgentType(), instance);
                     serverGroup.getInstances().add(instance);
                   });
               return serverGroup;

@@ -276,7 +276,6 @@ tencent:
       secretKey: ${TENCENTCLOUD_SECRET_KEY}
       regions: ["ap-guangzhou","ap-shanghai"]
 
-
 spring:
   jackson:
     mapper:

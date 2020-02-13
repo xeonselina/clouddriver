@@ -74,7 +74,7 @@ public class TencentSecurityGroupCachingAgent implements CachingAgent, OnDemandA
   public OnDemandResult handle(
       final ProviderCache providerCache, final Map<String, ? extends Object> data) {
     log.info("Enter TencentSecurityGroupCachingAgent handle, params = " + StringUtils.join(data));
-    if (!data.containsKey("securityGroupId")
+    if (!data.containsKey("securityGroupName")
         || !data.containsKey("account")
         || !data.containsKey("region")
         || !accountName.equals(data.get("account"))
@@ -85,15 +85,15 @@ public class TencentSecurityGroupCachingAgent implements CachingAgent, OnDemandA
 
     final TencentSecurityGroupDescription evictedSecurityGroup =
         TencentSecurityGroupDescription.builder().build();
-    final String securityGroupId = (String) data.get("securityGroupId");
+    final String securityGroupName = (String) data.get("securityGroupName");
 
     final TencentSecurityGroupDescription updatedSecurityGroup =
-        metricsSupport.readData(() -> loadSecurityGroupById(securityGroupId));
+        metricsSupport.readData(() -> loadSecurityGroupByName(securityGroupName));
 
     if (updatedSecurityGroup == null) {
       log.info(
           "TencentSecurityGroupCachingAgent: Can not find securityGroup "
-              + securityGroupId
+              + securityGroupName
               + " in "
               + getRegion());
       return null;
@@ -106,8 +106,7 @@ public class TencentSecurityGroupCachingAgent implements CachingAgent, OnDemandA
                 return buildCacheResult(providerCache, null, 0, updatedSecurityGroup, null);
               } else {
                 evictedSecurityGroup
-                    .setSecurityGroupId(securityGroupId)
-                    .setSecurityGroupName("unknown")
+                    .setSecurityGroupName(securityGroupName)
                     .setSecurityGroupDesc("unknown")
                     .setLastReadTime(System.currentTimeMillis());
                 return buildCacheResult(providerCache, null, 0, null, evictedSecurityGroup);
@@ -222,14 +221,14 @@ public class TencentSecurityGroupCachingAgent implements CachingAgent, OnDemandA
     return securityGroupDescriptionSet;
   }
 
-  private TencentSecurityGroupDescription loadSecurityGroupById(String securityGroupId) {
+  private TencentSecurityGroupDescription loadSecurityGroupByName(String securityGroupName) {
     VirtualPrivateCloudClient vpcClient =
         new VirtualPrivateCloudClient(
             credentials.getCredentials().getSecretId(),
             credentials.getCredentials().getSecretKey(),
             region);
 
-    SecurityGroup securityGroup = vpcClient.getSecurityGroupById(securityGroupId).get(0);
+    SecurityGroup securityGroup = vpcClient.getSecurityGroupByName(securityGroupName).get(0);
     long currentTime = System.currentTimeMillis();
     if (securityGroup != null) {
       TencentSecurityGroupDescription description =

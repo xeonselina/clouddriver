@@ -101,7 +101,6 @@ public class DestroyTencentServerGroupAtomicOperation implements AtomicOperation
           DescribeAutoScalingActivitiesResponse response =
               client.describeAutoScalingActivities(activityId);
           log.info("describeAutoScalingActivities response {}", response);
-          log.info("response.getActivitySet() {}", response.getActivitySet());
           if (!ArrayUtils.isEmpty(response.getActivitySet())) {
             Activity activity = response.getActivitySet()[0];
             String activity_status = activity.getStatusCode();

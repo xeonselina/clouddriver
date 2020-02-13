@@ -130,10 +130,15 @@ public class VirtualPrivateCloudClient {
     }
   }
 
-  public List<SecurityGroup> getSecurityGroupById(String securityGroupId) {
+  public List<SecurityGroup> getSecurityGroupByName(String securityGroupName) {
     try {
       DescribeSecurityGroupsRequest req = new DescribeSecurityGroupsRequest();
-      req.setSecurityGroupIds(new String[] {securityGroupId});
+      Filter[] filters = new Filter[1];
+      Filter filter = new Filter();
+      filter.setName("security-group-name");
+      filter.setValues(new String[] {securityGroupName});
+      filters[0] = filter;
+      req.setFilters(filters);
       DescribeSecurityGroupsResponse resp = client.DescribeSecurityGroups(req);
       return Arrays.asList(resp.getSecurityGroupSet());
     } catch (TencentCloudSDKException e) {

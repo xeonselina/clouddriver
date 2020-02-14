@@ -470,6 +470,11 @@ public class TencentServerGroupCachingAgent extends AbstractTencentCachingAgent
         || !data.containsKey("region")
         || !data.get("accountName").equals(getAccountName())
         || !data.get("region").equals(getRegion())) {
+      log.info(
+          "{} handle parameters mismatch, getAccountName is {}, gerRegion is {}",
+          getAgentType(),
+          getAccountName(),
+          getRegion());
       return null;
     }
 

@@ -11,6 +11,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import net.coding.cd.proto.CloudAccountProto;
+import net.coding.common.TeamHelper;
 import org.mapstruct.Mapper;
 import org.mapstruct.factory.Mappers;
 
@@ -28,10 +29,11 @@ public interface GrpcConverter {
     if (protocolStringList != null) {
       tencentGrpcAccount.setRegions(new ArrayList<>(protocolStringList));
     }
-    tencentGrpcAccount.setName(provider.getName());
+    tencentGrpcAccount.setName(TeamHelper.withSuffix(provider.getTeamId(), provider.getName()));
     tencentGrpcAccount.setSecretId(provider.getSecretId());
     tencentGrpcAccount.setSecretKey(provider.getSecretKey());
-    tencentGrpcAccount.setPermissions(getPermissionsBuilder(provider.getRolesList()));
+    tencentGrpcAccount.setPermissions(
+        getPermissionsBuilder(provider.getTeamId(), provider.getRolesList()));
     return tencentGrpcAccount;
   }
 
@@ -42,7 +44,7 @@ public interface GrpcConverter {
     KubernetesGrpcAccount kubernetesGrpcAccount = new KubernetesGrpcAccount();
     kubernetesGrpcAccount.setContext(provider.getContext());
     kubernetesGrpcAccount.setKubeconfigContents(provider.getKubeconfigContents());
-    kubernetesGrpcAccount.setName(provider.getName());
+    kubernetesGrpcAccount.setName(TeamHelper.withSuffix(provider.getTeamId(), provider.getName()));
     List<String> namespaces =
         Optional.ofNullable(provider.getNamespaces())
             .filter(e -> !Strings.isNullOrEmpty(e))
@@ -50,7 +52,8 @@ public interface GrpcConverter {
             .orElseGet(ArrayList::new);
     kubernetesGrpcAccount.setNamespaces(namespaces);
     kubernetesGrpcAccount.setServiceaccount(provider.getServiceaccount());
-    kubernetesGrpcAccount.setPermissions(getPermissionsBuilder(provider.getRolesList()));
+    kubernetesGrpcAccount.setPermissions(
+        getPermissionsBuilder(provider.getTeamId(), provider.getRolesList()));
     return kubernetesGrpcAccount;
   }
 
@@ -58,16 +61,16 @@ public interface GrpcConverter {
 
   List<KubernetesGrpcAccount> proto2kubernetes(List<CloudAccountProto.Kubernetes> providers);
 
-  default Permissions.Builder getPermissionsBuilder(List<String> roles) {
+  default Permissions.Builder getPermissionsBuilder(Integer teamId, List<String> roles) {
     if (roles == null || roles.isEmpty()) {
       return null;
     }
     Permissions.Builder permissions = new Permissions.Builder();
     roles.forEach(
         role -> {
-          permissions.add(Authorization.READ, role);
-          permissions.add(Authorization.WRITE, role);
-          permissions.add(Authorization.EXECUTE, role);
+          permissions.add(Authorization.READ, TeamHelper.withSuffix(teamId, role));
+          permissions.add(Authorization.WRITE, TeamHelper.withSuffix(teamId, role));
+          permissions.add(Authorization.EXECUTE, TeamHelper.withSuffix(teamId, role));
         });
     return permissions;
   }

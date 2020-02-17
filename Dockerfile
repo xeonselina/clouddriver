@@ -10,6 +10,7 @@ RUN ./gradlew clouddriver-web:installDist -x test
 FROM openjdk:8-jdk-alpine
 MAINTAINER delivery-engineering@netflix.com
 COPY --from=0 /compiled_sources/clouddriver-web/build/install/clouddriver /opt/clouddriver
+COPY --from=0 /compiled_sources/coding-deploy/config /opt/spinnaker/config
 
 ENV KUBECTL_VERSION v1.16.0
 

@@ -17,8 +17,8 @@
 
 package com.netflix.spinnaker.clouddriver.controllers;
 
-import com.netflix.spinnaker.clouddriver.artifacts.ArtifactCredentialsRepository;
 import com.netflix.spinnaker.clouddriver.artifacts.ArtifactDownloader;
+import com.netflix.spinnaker.clouddriver.artifacts.CodingArtifactCredentialsRepository;
 import com.netflix.spinnaker.clouddriver.artifacts.config.ArtifactCredentials;
 import com.netflix.spinnaker.kork.artifacts.model.Artifact;
 import java.util.Collections;
@@ -34,23 +34,23 @@ import org.springframework.web.servlet.mvc.method.annotation.StreamingResponseBo
 @RestController
 @RequestMapping("/artifacts")
 public class ArtifactController {
-  private ArtifactCredentialsRepository artifactCredentialsRepository;
+  private CodingArtifactCredentialsRepository artifactCredentialsRepository;
   private ArtifactDownloader artifactDownloader;
 
   @Autowired
   public ArtifactController(
-      Optional<ArtifactCredentialsRepository> artifactCredentialsRepository,
+      Optional<CodingArtifactCredentialsRepository> artifactCredentialsRepository,
       Optional<ArtifactDownloader> artifactDownloader) {
     this.artifactCredentialsRepository = artifactCredentialsRepository.orElse(null);
     this.artifactDownloader = artifactDownloader.orElse(null);
   }
 
-  @RequestMapping(method = RequestMethod.GET, value = "/credentials")
-  List<ArtifactCredentials> list() {
+  @RequestMapping(method = RequestMethod.GET, value = "/credentials/app/{appId}")
+  List<ArtifactCredentials> list(@PathVariable("appId") int appId) {
     if (artifactCredentialsRepository == null) {
       return Collections.emptyList();
     } else {
-      return artifactCredentialsRepository.getAllCredentials();
+      return artifactCredentialsRepository.getReposByAppId(appId);
     }
   }
 
@@ -61,25 +61,27 @@ public class ArtifactController {
       throw new IllegalStateException(
           "Artifacts have not been enabled. Enable them using 'artifacts.enabled' in clouddriver");
     }
-
     return outputStream -> IOUtils.copy(artifactDownloader.download(artifact), outputStream);
   }
 
-  @RequestMapping(method = RequestMethod.GET, value = "/account/{accountName}/names")
+  @RequestMapping(method = RequestMethod.GET, value = "/account/{accountName}/names/app/{appId}")
   List<String> getNames(
-      @PathVariable("accountName") String accountName, @RequestParam(value = "type") String type) {
+      @PathVariable("accountName") String accountName,
+      @PathVariable("appId") int appId,
+      @RequestParam(value = "type") String type) {
     ArtifactCredentials credentials =
-        artifactCredentialsRepository.getCredentials(accountName, type);
+        artifactCredentialsRepository.getCredentials(accountName, type, appId);
     return credentials.getArtifactNames();
   }
 
-  @RequestMapping(method = RequestMethod.GET, value = "/account/{accountName}/versions")
+  @RequestMapping(method = RequestMethod.GET, value = "/account/{accountName}/versions/app/{appId}")
   List<String> getVersions(
       @PathVariable("accountName") String accountName,
+      @PathVariable("appId") int appId,
       @RequestParam(value = "type") String type,
       @RequestParam(value = "artifactName") String artifactName) {
     ArtifactCredentials credentials =
-        artifactCredentialsRepository.getCredentials(accountName, type);
+        artifactCredentialsRepository.getCredentials(accountName, type, appId);
     return credentials.getArtifactVersions(artifactName);
   }
 }

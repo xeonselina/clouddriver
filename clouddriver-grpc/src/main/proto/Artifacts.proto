@@ -1,0 +1,41 @@
+syntax = "proto3";
+
+package coding.core.cloud.artifactRepo;
+
+option java_generic_services = true;
+option java_package = "net.coding.cd.proto";
+option java_outer_classname = "ArtifactsProto";
+
+message GetArtifactReposRequest {
+  int32 appId = 1;
+}
+
+message ArtifactReposResponse {
+  repeated ArtifactRepo ArtifactRepos = 1;
+}
+
+message ArtifactRepo {
+  enum ArtifactRepoType {
+    gitDepot = 0;
+    gitLabDepot = 1;
+    gitHubDepot = 2;
+    codingArtifacts = 3;
+    codingDockerRegister = 4;
+  }
+  ArtifactRepoType artifactRepoType = 1;
+  int32 id = 2;
+  string name = 3;
+}
+
+message SetAppCredentialsRequest {
+  int32 appId = 1;
+}
+
+message SetAppCredentialsResponse {
+  bool result = 1;
+}
+
+service GrpcArtifactsService {
+  rpc getArtifactRepos (GetArtifactReposRequest) returns (ArtifactReposResponse);
+  rpc setApplicationCredentials (SetAppCredentialsRequest) returns (SetAppCredentialsResponse);
+}

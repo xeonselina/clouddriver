@@ -4,7 +4,7 @@ import org.apache.commons.lang3.StringUtils;
 
 public class TeamHelper {
 
-  public static final String TEAM = "TEAM";
+  public static final String TEAM = "team";
 
   public static String getSuffix(String teamId) {
     return StringUtils.join(TEAM, teamId);
@@ -15,6 +15,6 @@ public class TeamHelper {
   }
 
   public static String replaceSuffix(String target) {
-    return target.replaceFirst("(?i)TEAM\\d+$", "");
+    return target.replaceFirst("(?i)team\\d+$", "");
   }
 }

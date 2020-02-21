@@ -45,12 +45,12 @@ public class ArtifactController {
     this.artifactDownloader = artifactDownloader.orElse(null);
   }
 
-  @RequestMapping(method = RequestMethod.GET, value = "/credentials/app/{appId}")
-  List<ArtifactCredentials> list(@PathVariable("appId") int appId) {
+  @RequestMapping(method = RequestMethod.GET, value = "/credentials/app/{appName}")
+  List<ArtifactCredentials> list(@PathVariable("appName") String appName) {
     if (artifactCredentialsRepository == null) {
       return Collections.emptyList();
     } else {
-      return artifactCredentialsRepository.getReposByAppId(appId);
+      return artifactCredentialsRepository.getReposByApp(appName);
     }
   }
 
@@ -64,24 +64,26 @@ public class ArtifactController {
     return outputStream -> IOUtils.copy(artifactDownloader.download(artifact), outputStream);
   }
 
-  @RequestMapping(method = RequestMethod.GET, value = "/account/{accountName}/names/app/{appId}")
+  @RequestMapping(method = RequestMethod.GET, value = "/account/{accountName}/names/app/{appName}")
   List<String> getNames(
       @PathVariable("accountName") String accountName,
-      @PathVariable("appId") int appId,
+      @PathVariable("appName") String appName,
       @RequestParam(value = "type") String type) {
     ArtifactCredentials credentials =
-        artifactCredentialsRepository.getCredentials(accountName, type, appId);
+        artifactCredentialsRepository.getCredentials(accountName, type, appName);
     return credentials.getArtifactNames();
   }
 
-  @RequestMapping(method = RequestMethod.GET, value = "/account/{accountName}/versions/app/{appId}")
+  @RequestMapping(
+      method = RequestMethod.GET,
+      value = "/account/{accountName}/versions/app/{appName}")
   List<String> getVersions(
       @PathVariable("accountName") String accountName,
-      @PathVariable("appId") int appId,
+      @PathVariable("appName") String appName,
       @RequestParam(value = "type") String type,
       @RequestParam(value = "artifactName") String artifactName) {
     ArtifactCredentials credentials =
-        artifactCredentialsRepository.getCredentials(accountName, type, appId);
+        artifactCredentialsRepository.getCredentials(accountName, type, appName);
     return credentials.getArtifactVersions(artifactName);
   }
 }

@@ -60,7 +60,6 @@ public class ServerGroupManagerController {
                 return requestQueue.execute(
                     application, () -> provider.getServerGroupManagersByApplication(application));
               } catch (Throwable t) {
-                log.warn("Failed to read server group managers", t);
                 return null;
               }
             })

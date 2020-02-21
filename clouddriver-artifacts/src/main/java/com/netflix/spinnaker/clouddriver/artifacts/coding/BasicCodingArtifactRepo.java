@@ -13,13 +13,23 @@ public class BasicCodingArtifactRepo {
     gitDepot,
     gitLabDepot,
     gitHubDepot,
-    codingArtifacts,
-    codingDockerRegister;
-
+    codingGeneric,
+    codingDockerRegister,
+    codingMaven,
+    codingNpm,
+    codingPypi,
+    codingHelm,
+    codingComposer,
+    codingNuget,
+    codingConan;
     private static final ArtifactRepoType[] types = ArtifactRepoType.values();
 
     public static ArtifactRepoType fromInteger(int i) {
       return types[i];
+    }
+
+    public static ArtifactRepoType fromArtifactType(Integer i) {
+      return types[i + 3];
     }
 
     @Override

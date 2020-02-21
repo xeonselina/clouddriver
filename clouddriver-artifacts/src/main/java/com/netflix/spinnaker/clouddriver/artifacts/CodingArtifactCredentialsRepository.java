@@ -17,8 +17,6 @@
 
 package com.netflix.spinnaker.clouddriver.artifacts;
 
-import static com.netflix.spinnaker.clouddriver.artifacts.coding.BasicCodingArtifactRepo.ArtifactRepoType.*;
-
 import com.netflix.spinnaker.clouddriver.artifacts.coding.BasicCodingArtifactRepo;
 import com.netflix.spinnaker.clouddriver.artifacts.coding.artifactrepo.ArtifactRepoCredentials;
 import com.netflix.spinnaker.clouddriver.artifacts.coding.client.CodingArtifactRepoGrpcClient;
@@ -31,10 +29,10 @@ import org.springframework.stereotype.Component;
 @Component
 public class CodingArtifactCredentialsRepository {
 
-  public List<ArtifactCredentials> getReposByAppId(int appId) {
+  public List<ArtifactCredentials> getReposByApp(String appName) {
     // 来自 coding 的 artifacts repo
     CodingArtifactRepoGrpcClient client = new CodingArtifactRepoGrpcClient();
-    List<BasicCodingArtifactRepo> codingRepos = client.getArtifactRepos(appId);
+    List<BasicCodingArtifactRepo> codingRepos = client.getArtifactRepos(appName);
     return codingRepos.stream()
         .map(
             it -> {
@@ -45,11 +43,31 @@ public class CodingArtifactCredentialsRepository {
                   return new GitArtifactCredentials("gitlab/file", it.getName(), it.getId());
                 case gitHubDepot:
                   return new GitArtifactCredentials("github/file", it.getName(), it.getId());
-                case codingArtifacts:
+                case codingComposer:
                   return new ArtifactRepoCredentials(
-                      "coding_artifacts/object", it.getName(), it.getId());
+                      "coding_composer/object", it.getName(), it.getId());
+                case codingPypi:
+                  return new ArtifactRepoCredentials(
+                      "coding_pypi/object", it.getName(), it.getId());
+                case codingGeneric:
+                  return new ArtifactRepoCredentials(
+                      "coding_generic/object", it.getName(), it.getId());
                 case codingDockerRegister:
                   return new ArtifactRepoCredentials("docker/image", it.getName(), it.getId());
+                case codingMaven:
+                  return new ArtifactRepoCredentials(
+                      "coding_maven/object", it.getName(), it.getId());
+                case codingNpm:
+                  return new ArtifactRepoCredentials("coding_npm/object", it.getName(), it.getId());
+                case codingHelm:
+                  return new ArtifactRepoCredentials(
+                      "coding_helm/object", it.getName(), it.getId());
+                case codingNuget:
+                  return new ArtifactRepoCredentials(
+                      "coding_nuget/object", it.getName(), it.getId());
+                case codingConan:
+                  return new ArtifactRepoCredentials(
+                      "coding_conan/object", it.getName(), it.getId());
                 default:
                   throw new IllegalStateException("Unexpected value: " + it.getArtifactRepoType());
               }
@@ -59,8 +77,8 @@ public class CodingArtifactCredentialsRepository {
     // kubernetes，external docker registry, custom artifacts
   }
 
-  public ArtifactCredentials getCredentials(String accountName, String type, int appId) {
-    return this.getReposByAppId(appId).stream()
+  public ArtifactCredentials getCredentials(String accountName, String type, String appName) {
+    return this.getReposByApp(appName).stream()
         .filter(it -> it.getName().equals(accountName) && it.handlesType(type))
         .findFirst()
         .orElse(null);

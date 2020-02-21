@@ -7,7 +7,7 @@ option java_package = "net.coding.cd.proto";
 option java_outer_classname = "ArtifactsProto";
 
 message GetArtifactReposRequest {
-  int32 appId = 1;
+  string appName = 1;
 }
 
 message ArtifactReposResponse {
@@ -16,11 +16,18 @@ message ArtifactReposResponse {
 
 message ArtifactRepo {
   enum ArtifactRepoType {
-    gitDepot = 0;
-    gitLabDepot = 1;
-    gitHubDepot = 2;
-    codingArtifacts = 3;
-    codingDockerRegister = 4;
+    gitDepot=0;
+    gitLabDepot=1;
+    gitHubDepot=2;
+    codingGeneric=3;
+    codingDockerRegister=4;
+    codingMaven=5;
+    codingNpm=6;
+    codingPypi=7;
+    codingHelm=8;
+    codingComposer=9;
+    codingNuget=10;
+    codingConan=11;
   }
   ArtifactRepoType artifactRepoType = 1;
   int32 id = 2;
@@ -28,7 +35,7 @@ message ArtifactRepo {
 }
 
 message SetAppCredentialsRequest {
-  int32 appId = 1;
+  int32 appName = 1;
 }
 
 message SetAppCredentialsResponse {

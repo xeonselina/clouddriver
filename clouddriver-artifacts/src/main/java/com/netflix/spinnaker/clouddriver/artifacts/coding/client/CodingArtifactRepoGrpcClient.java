@@ -19,10 +19,10 @@ public class CodingArtifactRepoGrpcClient extends BaseClient {
     return GrpcArtifactsServiceGrpc.newBlockingStub(openChannel());
   }
 
-  public List<BasicCodingArtifactRepo> getArtifactRepos(int applicationId) {
+  public List<BasicCodingArtifactRepo> getArtifactRepos(String appName) {
     try {
       ArtifactsProto.GetArtifactReposRequest request =
-          ArtifactsProto.GetArtifactReposRequest.newBuilder().setAppId(applicationId).build();
+          ArtifactsProto.GetArtifactReposRequest.newBuilder().setAppName(appName).build();
       ArtifactsProto.ArtifactReposResponse response = getStub().getArtifactRepos(request);
       return ArtifactRepoGrpcConverter.INSTANCE.proto2ArtifactRepo(response.getArtifactReposList());
     } catch (StatusRuntimeException e) {

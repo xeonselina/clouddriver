@@ -11,12 +11,13 @@ message emptyRequest {
 }
 
 message Kubernetes {
-    string name = 1;
-    string context = 2;
-    string namespaces = 3;
-    string kubeconfigContents = 4;
-    bool serviceaccount = 5;
-    repeated string roles = 6;
+    int32 teamId=1;
+    string name = 2;
+    string context = 3;
+    string namespaces = 4;
+    string kubeconfigContents = 5;
+    bool serviceaccount = 6;
+    repeated string roles = 7;
 }
 
 message KubernetesResponse {
@@ -24,11 +25,12 @@ message KubernetesResponse {
 }
 
 message Tencent {
-    string name = 1;
-    string secretId = 2;
-    string secretKey = 3;
-    repeated string regions = 4;
-    repeated string roles = 5;
+    int32 teamId=1;
+    string name = 2;
+    string secretId = 3;
+    string secretKey = 4;
+    repeated string regions = 5;
+    repeated string roles = 6;
 }
 
 message TencentResponse {

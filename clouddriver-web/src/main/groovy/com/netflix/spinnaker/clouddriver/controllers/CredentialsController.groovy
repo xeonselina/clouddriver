@@ -21,6 +21,7 @@ import com.netflix.spinnaker.clouddriver.configuration.CredentialsConfiguration
 import com.netflix.spinnaker.clouddriver.security.AccountCredentials
 import com.netflix.spinnaker.clouddriver.security.AccountCredentialsProvider
 import com.netflix.spinnaker.kork.web.exceptions.NotFoundException
+import net.coding.common.TeamHelper
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.context.MessageSource
 import org.springframework.web.bind.annotation.PathVariable
@@ -80,7 +81,6 @@ class CredentialsController {
     cred.type = accountCredentials.cloudProvider
     cred.challengeDestructiveActions = credentialsConfiguration.challengeDestructiveActionsEnvironments.contains(accountCredentials.environment)
     cred.primaryAccount = credentialsConfiguration.primaryAccountTypes.contains(accountCredentials.accountType)
-
     return cred
   }
 }
